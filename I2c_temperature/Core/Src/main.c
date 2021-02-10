@@ -111,14 +111,14 @@ int main(void)
   while (1)
   {
 		
-		buf[1] = (SHT31_MEAS_HIGHREP >> 8) ;
-		buf[0] = (SHT31_MEAS_HIGHREP & 0xff);
-		ret = HAL_I2C_Master_Transmit(&hi2c1, SHT31_ADDRS, buf, 2, HAL_MAX_DELAY);
-		HAL_I2C_Master_Receive(&hi2c1, SHT31_ADDRS, buf, 2, HAL_MAX_DELAY);
+		buf[0] = (SHT31_MEAS_HIGHREP >> 8) ;
+		buf[1] = (SHT31_MEAS_HIGHREP & 0xff);
+		ret = HAL_I2C_Master_Transmit(&hi2c1, SHT31_ADDRS >> 1, SHT31_MEAS_HIGHREP, 2, HAL_MAX_DELAY);
+		HAL_I2C_Master_Receive(&hi2c1, SHT31_ADDRS, buf, 6, HAL_MAX_DELAY);
 		if(ret != HAL_OK){
 			strcpy((char*)serial_text, "Error Tx\r\n");
 		} else {
-			ret = HAL_I2C_Master_Receive(&hi2c1, SHT31_ADDRS, buf, 2, HAL_MAX_DELAY);
+			ret = HAL_I2C_Master_Receive(&hi2c1, SHT31_ADDRS, buf, 6, HAL_MAX_DELAY);
 			if( ret != HAL_OK){
 			strcpy((char*)buf, "Error Tx\r\n");
 			} else {
