@@ -22,14 +22,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "string.h"
-#include "stdio.h"
-#include "fonctions.h"
+#include "lib_lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+static rgb_lcd lcdData;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -70,7 +68,7 @@ static void MX_USART2_UART_Init(void);
   */
 int main(void)
 {
-	  /* USER CODE BEGIN 1 */
+  /* USER CODE BEGIN 1 */
 		HAL_StatusTypeDef ret;
 		// saves return variable to handle errors aproppiately
 		uint16_t ST, SRH;
@@ -83,7 +81,7 @@ int main(void)
 		float temp, humidity;
 
 		uint8_t buf[12], serial_text[12];//general use buffer
-	  /* USER CODE END 1 */
+  /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -106,7 +104,12 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  /*
+  lcd_init(&hi2c1, &lcdData); // initialise le lcd
+  lcd_position(&hi2c1,0,0);//cositas
+  lcd_print(&hi2c1,"Starting");
+  reglagecouleur(0,0,255);
+  HAL_Delay(5000);*/
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -138,7 +141,7 @@ int main(void)
 				stemp = -45 + stemp;
 				temp = stemp;
 				sprintf((char*)serial_text,
-				"%u.%0.2u C\r\n",
+				"%u.%0.2u C\n",
 				((unsigned int) temp),
 				(((unsigned int) temp  % 100)*100));
 			}
@@ -148,181 +151,17 @@ int main(void)
 		//strcpy((char*)serial_text, "hello!\r\n");
 		HAL_UART_Transmit(&huart2, serial_text, strlen((char*)serial_text), HAL_MAX_DELAY);
 		HAL_Delay(500);
-
-		//------------------ LCD.begin start ------------------------
-		uint8_t display_function;
-		uint16_t com;
-
-		display_function |= 0x08;//LCD_2Line
-		com = command(0x20 | display_function);
-
-		//primera vez
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-		//segunda vez
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-		//tercera vez
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-		//cuarta vez
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-
-        display_function = 0x04 | 0x00 | 0x00;
-        display_function |= 0x04;
-        com = command(0x08 | display_function);
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-
-        //clear
-        com = command(0x01);
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-
-        //initialize to default text direction
-        display_function = 0x02 | 0x00;
-        com = command(0x04 | display_function);
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-        com = 0x0000;
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-				 RGB_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-        com = 0xff08;
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-				 RGB_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-
-        com = 0x2001;
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-				 RGB_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-
-        com = 0x0004;//red
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-				 RGB_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-        com = 0x0003;//green
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-				 RGB_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-        com = 0xff02;//blue
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-				 RGB_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-        //------------------ LCD.begin ends ------------------------
-
-        //------------------ LCD.print starts ------------------------
-        //clear
-        com = 00110000;
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-
-        com = 00110000;
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 1,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-        com = write_com('u');
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-        com = write_com('l');
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-        com = write_com('o');
-        ret = HAL_I2C_Master_Transmit(
-                 &hi2c1,
-                 LCD_ADDRS,
-                 &com,
-                 2,
-                 HAL_MAX_DELAY);
-        HAL_Delay(5);
-
-
-
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+		/*clearlcd();
+		  lcd_position(&hi2c1,0,0);
+		  lcd_print(&hi2c1,"Temp:");
+		  lcd_position(&hi2c1,0,1);
+		  lcd_print(&hi2c1, serial_text);
+		  reglagecouleur(255,0,255);*/
+
+	  }
   /* USER CODE END 3 */
 }
 
@@ -504,3 +343,4 @@ void assert_failed(uint8_t *file, uint32_t line)
 #endif /* USE_FULL_ASSERT */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
