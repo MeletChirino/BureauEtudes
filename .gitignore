@@ -1,0 +1,22 @@
+Blinky/*
+Exemple2/
+SHT31_i2c/.cproject
+SHT31_i2c/.mxproject
+SHT31_i2c/.project
+SHT31_i2c/.settings/
+SHT31_i2c/Core/Inc/
+SHT31_i2c/Core/Src/gpio.c
+SHT31_i2c/Core/Src/i2c.c
+SHT31_i2c/Core/Src/stm32l1xx_hal_msp.c
+SHT31_i2c/Core/Src/stm32l1xx_it.c
+SHT31_i2c/Core/Src/syscalls.c
+SHT31_i2c/Core/Src/sysmem.c
+SHT31_i2c/Core/Src/system_stm32l1xx.c
+SHT31_i2c/Core/Src/usart.c
+SHT31_i2c/Core/Startup/
+SHT31_i2c/Debug/
+SHT31_i2c/Drivers/
+SHT31_i2c/SHT31_i2c Debug.launch
+SHT31_i2c/STM32L152RETX_FLASH.ld
+SHT31_i2c/STM32L152RETX_RAM.ld
+exemple3/
