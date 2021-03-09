@@ -20,3 +20,7 @@ SHT31_i2c/SHT31_i2c Debug.launch
 SHT31_i2c/STM32L152RETX_FLASH.ld
 SHT31_i2c/STM32L152RETX_RAM.ld
 exemple3/
+venv/
+web_server/web_server/__pycache__/__init__.cpython-37.pyc
+web_server/web_server/__pycache__/__init__.cpython-37.pyc
+web_server/web_server/__pycache__/
