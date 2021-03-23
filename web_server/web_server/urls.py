@@ -16,11 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
+from .views import api1, send_data, rev_commande
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home', TemplateView.as_view(
         template_name = 'landing_page.html'
-            )
+            ),
+            name="home",
         ),
+    path('api/<int:commande>', api1),
+    path('send', send_data, name="send_data"),
+    path('rev_commande', rev_commande, name="rev_commande"),
 ]
