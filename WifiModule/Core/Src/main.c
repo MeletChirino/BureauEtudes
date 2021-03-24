@@ -105,18 +105,25 @@ void print_lcd2(char line_1[16], char line_2[16], int R, int G, int B){
 	  reglagecouleur(R, G, B);
 
 }
-void show_plate(char *input){
+void show_plate(char *input, char *commande){
 	//find :
-	int start, length;
+	int start, start2, length, new = 0; ;
 	char string[40];
 	length = strlen((char*)input);
 	for(int i = 0; i < length; i++){
 		if(input[i] == ':')
 			start = i;
+		if(input[i] == ';')
+			start2 = i;
 	}
-	int new = 0;
+
 	for(int i = start + 1; i < length - 10; i++){
 		string[new] = input[i];
+		new++;
+	}
+	new = 0;
+	for(int i = start2 + 1; i < length - 10; i++){
+		commande[new] = input[i];
 		new++;
 	}
 	lcd_print(&hi2c1, string);
@@ -162,6 +169,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart1, rx_buffer, 1);
   lcd_init(&hi2c1, &lcdData); // initialise le lcd
+  ATCommand("ATE1");
 
   print_lcd2("system:", "Starting", 0,0,255);
   // --------------- wifi init ---------------
@@ -171,15 +179,15 @@ int main(void)
   //input_string;
   print_lcd2("WiFi state:", "connected", 0, 255, 0);
   print_lcd2("Server state:", "starting", 0, 255, 255);
-  //ATCommand("AT+CIPMODE=3");
+  ATCommand("AT+CWMODE=3");
   ATCommand("AT+CIPMUX=1");
   ATCommand("AT+CIPSERVER=1");
+  ATCommand("AT+CIPSTATUS");
 
   print_lcd2("Server state:", "started", 0, 255, 255);
-  ATCommand("ATE0");
+
   print_lcd2("Waiting for new", "commandes", 0, 255, 0);
   __HAL_UART_FLUSH_DRREGISTER(&huart1);
-  input_complete = 0;
 
   /* USER CODE END 2 */
 
@@ -187,27 +195,51 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  char commande[2];
 
+	  //HAL_Delay(2000);
+	  //while(!input_complete);
 	  if(input_complete){
 		  strcpy((char*)screen_text, input_buffer);
 		  clearlcd();
+		  if(input_string == "waiting--------;00")
+			  reglagecouleur(0, 255, 0);
+		  else{
+		  reglagecouleur(255, 0, 0);}
 		  lcd_position(&hi2c1,0,0);//cositas
-		  show_plate(input_string);
+		  show_plate(input_string, commande);
+		  lcd_position(&hi2c1,0,1);//cositas
+		  lcd_print(&hi2c1, commande);
 		  __HAL_UART_FLUSH_DRREGISTER(&huart1);
 		  input_complete = 0;
 	  }
+	  if(!HAL_GPIO_ReadPin (GPIOB, GPIO_PIN_5)){
+		  ATCommand("AT+CIPSERVER=0");
+		  ATCommand("AT+CIPMUX=0");
+		  ATCommand("AT+CIPSTART=\"TCP\",\"debian\",8000");
+		  //strcpy((char*)request, "GET /api/67 HTTP/1.1\r\nHost:debian");
+		  sprintf((char*)request,
+				  "GET /api/%c%c HTTP/1.1\r\nHost:debian",
+				  commande[0],
+				  commande[1]
+				  );
+		  sprintf((char*)cmd,
+				  "AT+CIPSEND=%i",
+				  strlen((char*)request)
+				  );
+
+		  ATCommand(cmd);
+		  ATCommand(request);
+		  ATCommand("AT+CIPCLOSE");
+		  ATCommand("AT+CIPMUX=1");
+		  ATCommand("AT+CIPSERVER=1");
+		  __HAL_UART_FLUSH_DRREGISTER(&huart1);
+		  }
+	  //print_lcd2("Waiting for new", "commandes", 0, 255, 0);
+
 
 	  /*
-	  ATCommand("AT+CIPSTART=\"TCP\",\"debian\",8000\r\n");
-	  strcpy((char*)request, "GET /api/67 HTTP/1.1\r\nHost:debian");
-	  sprintf((char*)cmd,
-			  "AT+CIPSEND=%i",
-			  strlen((char*)request)
-			  );
 
-	  ATCommand(cmd);
-	  ATCommand(request);
-	  ATCommand("AT+CIPCLOSE");
 
 
 	  if(input_complete){
