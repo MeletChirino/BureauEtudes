@@ -1,0 +1,3 @@
+DMA_CIRCULAR.c:33:9:check_for	24	static
+DMA_CIRCULAR.c:48:6:USART_IrqHandler	24	static
+DMA_CIRCULAR.c:61:6:DMA_IrqHandler	24	static
