@@ -1,32 +1,88 @@
 """Views file for Django"""
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 import socket
+import time
+from apps.menus.models import Menu
+from apps.commandes.models import Commandes
+
+def home(request):
+    menus = Menu.objects.all()
+    data = {"menu": menus}
+    return render(request, 'landing_page.html', context=data)
 
 def rev_commande(request):
     if request.method=="POST":
         plate = request.POST["plate"]
         email = request.POST["email"]
-        plate_as_bytes = str.encode(plate)
-        print(f"se pidio un {plate_as_bytes} para {email}")
+        waiting_line = Commandes.objects.filter(state=2)
+        plate_ = Menu.objects.get(name=plate)
+        new_command = Commandes(plate=plate_, email=email)
+        new_command.save()#guardar la commanda
+
+        print(waiting_line)
+
+        if(waiting_line):
+            #if there is something in kitchen it just saves the commande
+            print("Hay algo en la cocina, no se puede enviar por ahora")
+            return redirect("home")
+        else:
+            new_command.state = 2
+            new_command.save()#guardar la commanda
+            print("enviando la commanda")
+            comm = f"{new_command.plate};{new_command.pk}"
+            plate_as_bytes = str.encode(plate)
+            print(f"commande: {comm}")
+            try:
+                server_ip = "192.168.1.32"
+                server_port = 333
+                kitchen = socket.socket()
+                print(kitchen)
+                kitchen.connect((server_ip, server_port))
+                kitchen.send(str.encode(comm))
+                kitchen.close()
+                return redirect("home")
+            except Exception as e:
+                return HttpResponse(e)
+    else:
+        return redirect("home")
+
+def api1(request, commande):
+    commande_ = Commandes.objects.get(pk=commande)
+    commande_.state = 3
+    commande_.save()
+    time.sleep(5)
+    waiting_line = Commandes.objects.filter(state=1)
+    print(waiting_line)
+    if(waiting_line):
         try:
+            print(f"Platos en lista de espera: {waiting_line[0].plate}")
+            comm = f"{waiting_line[0].plate};{waiting_line[0].pk}"
+            print(comm)
             server_ip = "192.168.1.32"
             server_port = 333
             kitchen = socket.socket()
             print(kitchen)
             kitchen.connect((server_ip, server_port))
-            kitchen.send(str.encode(plate))
+            kitchen.send(str.encode(comm))
             kitchen.close()
-            return HttpResponse("buena crack")
+            return redirect("home")
         except Exception as e:
             return HttpResponse(e)
-    else:
-        return redirect("home")
 
-def api1(request, commande):
-    data = {"data":"buena"}
-    print(commande)
-    return JsonResponse(data)
+    else:
+        comm = f"waiting--------;00"
+        print(comm)
+        server_ip = "192.168.1.32"
+        server_port = 333
+        kitchen = socket.socket()
+        print(kitchen)
+        kitchen.connect((server_ip, server_port))
+        kitchen.send(str.encode(comm))
+        kitchen.close()
+        data = {"data":"buena"}
+        print(commande)
+        return JsonResponse(data)
 
 def send_data(request):
     try:

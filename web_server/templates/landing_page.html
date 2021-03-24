@@ -44,14 +44,10 @@ body, html {height: 100%}
       <form action="{% url "rev_commande"%}" method=POST>
         {% csrf_token %}
         <h5>
-        <input type="radio" name="plate" value="Pates a la bolognese">
-        <label>Pates a la bolognese<b>$3.50</b></label><br>
-        <input type="radio" name="plate" value="Pates Au saumon">
-        <label>Pates Au saumon<b>$2.50</b></label><br>
-        <input type="radio" name="plate" value="Filet Mignon">
-        <label>Filet Mignon<b>$5.50</b></label><br>
-        <input type="radio" name="plate" value="Chicken Salad">
-        <label>Chicken Salad <b>$0.0</b></label><br>
+				{% for plate in menu %}
+				<input type="radio" name="plate" value="{{plate}}">
+				<label>{{plate}}<b> ${{plate.price}}.50</b></label><br>
+		{% endfor %}
       </h5>
 
         <p><input class="w3-input w3-padding-16 w3-border" type="email" placeholder="Email" required name="email"></p>
