@@ -24,3 +24,7 @@ venv/
 web_server/web_server/__pycache__/__init__.cpython-37.pyc
 web_server/web_server/__pycache__/__init__.cpython-37.pyc
 web_server/web_server/__pycache__/
+*.pyc
+*/__pycache__/*
+*/migrations/*
+wifi_module_arduino/
