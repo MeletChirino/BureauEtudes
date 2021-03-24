@@ -21,4 +21,4 @@ class Commandes(models.Model):
     created =  models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "%s->%s: %s"%(self.id, self.email, self.plate.name)
+        return "%s->%s: %s (%s)"%(self.id, self.email, self.plate.name, self.state)
