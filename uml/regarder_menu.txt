@@ -1,0 +1,6 @@
+@startuml
+actor Etudiant
+database Server
+Etudiant -> Server: Montrer le menu
+Server --> Etudiant: Menu
+@enduml

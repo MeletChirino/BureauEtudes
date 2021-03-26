@@ -1,0 +1,13 @@
+@startuml
+actor Etudiant as e
+actor "Kitchen Staff" as staff
+package RU {
+	usecase "Regarder le menu" as UC1
+	usecase "Commander une formule" as UC2
+	usecase "Modifier le Menu" as UC3
+}
+e --> UC1
+e --> UC2
+staff --> UC2
+staff --> UC3
+@enduml

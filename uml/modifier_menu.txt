@@ -1,0 +1,9 @@
+@startuml
+actor "Kitchen Staff" as staff
+database Server
+staff -> Server: Modifier une formule
+activate Server
+Server -> Server: Mettre a jour la base de donnes
+Server --> staff: Montrer nouveau menu
+deactivate Server
+@enduml

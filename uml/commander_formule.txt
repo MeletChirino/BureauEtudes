@@ -1,0 +1,32 @@
+@startuml
+actor Etudiant
+database Server
+participant "Wifi Module" as wifi
+actor "Kitchen Staff" as staff
+Etudiant -> Server: Choix du formule
+activate Server
+alt Rien dans la queue
+	Server -> wifi: Choix de l étudiant
+	activate wifi
+	wifi -> staff: Montrer le Formule Commande
+	activate staff
+	staff -> wifi: Commande Pret
+	deactivate staff
+	wifi --> Server: Commande pret
+	deactivate wifi
+else Commande dans la queue
+	loop S'il y a une queue
+		Server -> Server: Ajouter la Commande a la queue
+		Server -> wifi: Prochaine Commande dans la queue
+		activate wifi
+		wifi -> staff: Commmande dans la queu
+		activate staff
+		staff --> wifi: Dernier commande pret
+		deactivate staff
+		wifi -> Server: Commande pret
+		deactivate wifi
+	end
+end
+Server -> Etudiant: Commande Pret
+deactivate Server
+@enduml
