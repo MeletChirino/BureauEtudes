@@ -1,10 +1,16 @@
 """Views file for Django"""
+#Django modules
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
-import socket
-import time
+
+#local modules
 from apps.menus.models import Menu
 from apps.commandes.models import Commandes
+from .mails import commande_pret
+
+#Python modules
+import socket
+import time
 
 def home(request):
     menus = Menu.objects.all()
@@ -87,6 +93,7 @@ def api1(request, commande):
         commande_ = Commandes.objects.get(pk=commande)
         commande_.state = 3
         commande_.save()
+        commande_pret(commande_)
 
         time.sleep(5)
         waiting_line = Commandes.objects.all().exclude(state=3)
