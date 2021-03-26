@@ -117,7 +117,8 @@ void show_plate(char *input, char *commande){
 			start2 = i;
 	}
 
-	for(int i = start + 1; i < length - 10; i++){
+	for(int i = start + 1; i < length - 12; i++){
+
 		string[new] = input[i];
 		new++;
 	}
@@ -140,6 +141,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	//int buffer_lenght = 40;
+	char commande[2];
 	uint8_t cmd[40], request[40], screen_text[40];
 
 
@@ -188,14 +190,35 @@ int main(void)
 
   print_lcd2("Waiting for new", "commandes", 0, 255, 0);
   __HAL_UART_FLUSH_DRREGISTER(&huart1);
+  commande[0] = '0';
+  commande[1] = '0';
 
+  ATCommand("AT+CIPSERVER=0");
+  ATCommand("AT+CIPMUX=0");
+  ATCommand("AT+CIPSTART=\"TCP\",\"debian\",8000");
+  sprintf((char*)request,
+		  "GET /api/%c%c HTTP/1.1\r\nHost:debian",
+		  commande[0],
+		  commande[1]
+		  );
+  sprintf((char*)cmd,
+		  "AT+CIPSEND=%i",
+		  strlen((char*)request)
+		  );
+
+  ATCommand(cmd);
+  ATCommand(request);
+  ATCommand("AT+CIPCLOSE");
+  ATCommand("AT+CIPMUX=1");
+  ATCommand("AT+CIPSERVER=1");
+  __HAL_UART_FLUSH_DRREGISTER(&huart1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  char commande[2];
+
 
 	  //HAL_Delay(2000);
 	  //while(!input_complete);

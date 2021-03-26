@@ -28,3 +28,6 @@ web_server/web_server/__pycache__/
 */__pycache__/*
 */migrations/*
 wifi_module_arduino/
+web_server/apps/commandes/migrations/
+web_server/apps/menus/migrations/
+arduino_serial.txt
