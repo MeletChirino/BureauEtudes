@@ -31,3 +31,7 @@ wifi_module_arduino/
 web_server/apps/commandes/migrations/
 web_server/apps/menus/migrations/
 arduino_serial.txt
+web_server/db.sqlite3
+web_server/db.sqlite3
+web_server/db.sqlite3
+SHT31_i2c/JHD1313 FP-RGB-1 1.4.pdf

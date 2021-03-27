@@ -24,11 +24,12 @@ key = os.getenv('SECRET_KEY_DJANGO')
 SECRET_KEY = key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+#DEBUG = True
 
 ALLOWED_HOSTS = [
     '192.168.1.77',
-    'testcasaandrea.webhop.me',
+    'projetbe.serveblog.net',
     'debian',
     'localhost',
     ]
