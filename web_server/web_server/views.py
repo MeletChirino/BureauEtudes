@@ -1,10 +1,16 @@
 """Views file for Django"""
+#Django modules
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
-import socket
-import time
+
+#local modules
 from apps.menus.models import Menu
 from apps.commandes.models import Commandes
+from .mails import commande_pret
+
+#Python modules
+import socket
+import time
 
 def home(request):
     menus = Menu.objects.all()
@@ -48,41 +54,79 @@ def rev_commande(request):
         return redirect("home")
 
 def api1(request, commande):
-    commande_ = Commandes.objects.get(pk=commande)
-    commande_.state = 3
-    commande_.save()
-    time.sleep(5)
-    waiting_line = Commandes.objects.filter(state=1)
-    print(waiting_line)
-    if(waiting_line):
-        try:
-            print(f"Platos en lista de espera: {waiting_line[0].plate}")
-            comm = f"{waiting_line[0].plate};{waiting_line[0].pk}"
-            print(comm)
+    print(commande)
+    if(commande == 0):
+        #si es 0 revisa si hay commandes en train de faire, sino manda el waiting
+        time.sleep(5)
+        waiting_line = Commandes.objects.all().exclude(state=3)
+        #print(waiting_line)
+        if(waiting_line):
+            try:
+                print(f"Platos en lista de espera: {waiting_line[0].plate}")
+                comm = f"{waiting_line[0].plate};{waiting_line[0].pk}"
+                #print(comm)
+                server_ip = "192.168.1.32"
+                server_port = 333
+                kitchen = socket.socket()
+                #print(kitchen)
+                kitchen.connect((server_ip, server_port))
+                kitchen.send(str.encode(comm))
+                kitchen.close()
+                return redirect("home")
+            except Exception as e:
+                return HttpResponse(e)
+
+        else:
+            comm = f"Push to receive ;00"
+            #print(comm)
             server_ip = "192.168.1.32"
             server_port = 333
             kitchen = socket.socket()
-            print(kitchen)
+            #print(kitchen)
             kitchen.connect((server_ip, server_port))
             kitchen.send(str.encode(comm))
             kitchen.close()
-            return redirect("home")
-        except Exception as e:
-            return HttpResponse(e)
-
+            data = {"data":"buena"}
+            #print(commande)
+            return JsonResponse(data)
     else:
-        comm = f"waiting--------;00"
-        print(comm)
-        server_ip = "192.168.1.32"
-        server_port = 333
-        kitchen = socket.socket()
-        print(kitchen)
-        kitchen.connect((server_ip, server_port))
-        kitchen.send(str.encode(comm))
-        kitchen.close()
-        data = {"data":"buena"}
-        print(commande)
-        return JsonResponse(data)
+        commande_ = Commandes.objects.get(pk=commande)
+        commande_.state = 3
+        commande_.save()
+        commande_pret(commande_)
+
+        time.sleep(5)
+        waiting_line = Commandes.objects.all().exclude(state=3)
+        #print(waiting_line)
+        if(waiting_line):
+            try:
+                print(f"Platos en lista de espera: {waiting_line[0].plate}")
+                comm = f"{waiting_line[0].plate};{waiting_line[0].pk}"
+                #print(comm)
+                server_ip = "192.168.1.32"
+                server_port = 333
+                kitchen = socket.socket()
+                #print(kitchen)
+                kitchen.connect((server_ip, server_port))
+                kitchen.send(str.encode(comm))
+                kitchen.close()
+                return redirect("home")
+            except Exception as e:
+                return HttpResponse(e)
+
+        else:
+            comm = f"Push to receive ;00"
+            #print(comm)
+            server_ip = "192.168.1.32"
+            server_port = 333
+            kitchen = socket.socket()
+            #print(kitchen)
+            kitchen.connect((server_ip, server_port))
+            kitchen.send(str.encode(comm))
+            kitchen.close()
+            data = {"data":"buena"}
+            #print(commande)
+            return JsonResponse(data)
 
 def send_data(request):
     try:
