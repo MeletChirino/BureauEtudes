@@ -1,0 +1,27 @@
+@startuml
+start
+:AT+CIPSERVER=0;
+:AT+CIPMUX=0;
+note right
+	We must disable server and mux
+	to send data over TCP
+end note
+:AT+CIPSTART="TCP","debian",8000;
+:AT+CIPSEND=20;
+note left
+	This number is the length
+	of the request send just
+	after
+end note
+:GET /api/44 HTTP/1.1
+Host:debian;
+:AT+CIPCLOSE;
+:AT+CIPMUX=1;
+note right
+	Now we can re-enable server and
+	mux if the server wants to send
+	new data
+end note
+:AT+CIPSERVER=1;
+stop
+@enduml

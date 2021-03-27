@@ -1,0 +1,13 @@
+@startuml
+start
+repeat
+:AT+CWMODE=3;
+:AT+CIPMUX=1;
+:AT+CIPSERVER=1;
+repeat while (AT+CIPSTATUS != "OK")
+note left
+	This line just checks
+	if connection is OK
+end note
+stop
+@enduml
