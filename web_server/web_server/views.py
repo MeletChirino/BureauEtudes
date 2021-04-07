@@ -40,7 +40,7 @@ def rev_commande(request):
             plate_as_bytes = str.encode(plate)
             print(f"commande: {comm}")
             try:
-                server_ip = "192.168.1.32"
+                server_ip = "ESP_B2B2CC"
                 server_port = 333
                 kitchen = socket.socket()
                 print(kitchen)
@@ -65,7 +65,8 @@ def api1(request, commande):
                 print(f"Platos en lista de espera: {waiting_line[0].plate}")
                 comm = f"{waiting_line[0].plate};{waiting_line[0].pk}"
                 #print(comm)
-                server_ip = "192.168.1.32"
+                server_ip = "ESP_B2B2CC"
+                #server_ip = "192.168.1.32"
                 server_port = 333
                 kitchen = socket.socket()
                 #print(kitchen)
@@ -79,7 +80,8 @@ def api1(request, commande):
         else:
             comm = f"Push to receive ;00"
             #print(comm)
-            server_ip = "192.168.1.32"
+            server_ip = "ESP_B2B2CC"
+            #server_ip = "192.168.1.32"
             server_port = 333
             kitchen = socket.socket()
             #print(kitchen)
@@ -103,7 +105,8 @@ def api1(request, commande):
                 print(f"Platos en lista de espera: {waiting_line[0].plate}")
                 comm = f"{waiting_line[0].plate};{waiting_line[0].pk}"
                 #print(comm)
-                server_ip = "192.168.1.32"
+                server_ip = "ESP_B2B2CC"
+                #server_ip = "192.168.1.32"
                 server_port = 333
                 kitchen = socket.socket()
                 #print(kitchen)
@@ -117,7 +120,8 @@ def api1(request, commande):
         else:
             comm = f"Push to receive ;00"
             #print(comm)
-            server_ip = "192.168.1.32"
+            server_ip = "ESP_B2B2CC"
+            #server_ip = "192.168.1.32"
             server_port = 333
             kitchen = socket.socket()
             #print(kitchen)
@@ -130,7 +134,8 @@ def api1(request, commande):
 
 def send_data(request):
     try:
-        server_ip = "192.168.1.32"
+        server_ip = "ESP_B2B2CC"
+        #server_ip = "192.168.1.32"
         server_port = 333
         kitchen = socket.socket()
         print(kitchen)
