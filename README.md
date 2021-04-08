@@ -1,5 +1,8 @@
 # Bureau D'Etudes
-Nous avons ete nomees STM31_25
+Par CHIRINO Melet & NAVARRO Gregoire 
+(M1 SME 2020/2021)
+Universite Toulouse III Paul Sabatier
+[Link](https://youtu.be/tHxiUkCK4A0) to the video in youtube.
 ## TP1 Blinky
 Make main Led of the board blink 
 ## TP2 Connecter l'ecran LCD
@@ -8,7 +11,7 @@ Connect LCD Screen and see some strings
 Use SHT31 sensor to measure temperature and show it on LCD Screen previously used.
 [SHT31 Arduino's library](https://github.com/Seeed-Studio/Grove_SHT31_Temp_Humi_Sensor "Arduino's Library")
 ## Bureau d'etudes project
-Our project consists to create a IoT device to improve the RU in covid Times
+Our project consists to create a IoT device to improve the RU in covid Times. 
 ### Introduction
 Main RU in Paul Sabatier University is always full and it makes students spend a lot of time in a waiting line. Restaurant works as an assembly line where the student wait its turn in the line and then it chooses what it wants. This system spends a lost of time while choosing and paying time(there is always someone who cant make a quick decision). Our idea is that students can see the menu, choose what they want and pay from their cell phone and then wait for a email that says that their food is ready to pick up. For this we will use a nucleo 152l-RE development board, a Wifi module (esp8266), a regular LCD which works via I2C and a web server powered by Django (python).
 ### Improved Process 
@@ -37,7 +40,7 @@ We are using a simple sqlite3 database but it can be changed to a Postgress one 
 This API page will not work from a web browser, it is meant to receive communication from the wifi module and executes a python script to notify the student about their food and then sends back the data of waiting line (if there is any). Right now it sends information directly to the IP of wifi module over TCP protocol, so static IP of wifi module must be configured before.
 This API uses a email stmp service to send notifications to students.
 ### Wifi Module
-This wifi module is the ESP8266 which is a microcontroller itself and communicates via Serial Communication. In order to interact with it there are some commands that can be used to input and output information over the network. Those commands can be programmed directly to the module with a TTL to Serial converter or a arduino board to connect to wifi and get some raw information, but our goal is to make it work with stm32 board. For security reasons in this project we are not going to set any password authentication. 
+This wifi module is the ESP8266 which is a microcontroller itself and communicates via Serial Communication. In order to interact with it there are some commands that can be used to input and output information over the network, more information in [datasheet](https://www.espressif.com/sites/default/files/documentation/0a-esp8266ex_datasheet_en.pdf). Those commands can be programmed directly to the module with a TTL to Serial converter or a arduino board to connect to wifi and get some raw information, but our goal is to make it work with stm32 board. For security reasons in this project we are not going to set any password authentication. 
 This Wifi module supports UDP and TCP communication protocols, the last one chosen for this project. Setting up, communication and authentication algorithms are shown below.
 ![alt text](/uml/flowchart.png)
 ![alt text](/uml/flowchart_send.png)
