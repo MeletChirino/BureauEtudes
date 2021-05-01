@@ -5,46 +5,41 @@ Parte .h :
 #include <string.h>
 #include <math.h>
 
-//*** Functions prototypes ***//
-
 void DHT22_Init(GPIO_TypeDef* DataPort, uint16_t DataPin); // initialisation du capteur
 
-//Change pin mode
+//Mode 1 PIN pour lecture avec AM2302
 static void ONE_WIRE_PinMode(OnePinMode_Typedef mode);
-
-//One Wire pin HIGH/LOW Write
 static void ONE_WIRE_Pin_Write(bool state);
 static bool ONE_WIRE_Pin_Read(void);
 
 static void DelayMicroSeconds(uint32_t uSec); // fonction qui ajoute du delai
 
 
-static void DHT22_StartAcquisition(void); //
+static void DHT22_StartAcquisition(void); //Le capteur recupère les valeurs
 
 
-static void DHT22_ReadRaw(uint8_t *data); // le capteur convertie ces donnees pour le micro controleur
+static void DHT22_ReadRaw(uint8_t *data); //Lecture des données en raw
 
 
-bool DHT22_GetTemp_Humidity(float *Temp, float *Humidity); // le capteur recupere les donnees de temp et hum
+bool DHT22_GetTemp_Humidity(float *Temp, float *Humidity); // On convertit les données Raw en des données lisibles et on les affiche
 
 
 Parte .c :
 
 #include "DHT22.h"
 
-//Bit fields manipulations
+// Choix des bits de lectures, start, stop et ecriture
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 #define bitSet(value, bit) ((value) |= (1UL << (bit)))
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
-//1. One wire data line
+//1. Déclaration
 static GPIO_TypeDef* oneWire_PORT;
 static uint16_t oneWire_PIN;
 static uint8_t oneWirePin_Idx;
 
-//*** Functions prototypes ***//
-//OneWire Initialise
+
 void DHT22_Init(GPIO_TypeDef* DataPort, uint16_t DataPin)
 {
 	oneWire_PORT = DataPort;
@@ -60,7 +55,7 @@ void DHT22_Init(GPIO_TypeDef* DataPort, uint16_t DataPin)
 
 	
 }
-//Change pin mode
+
 static void ONE_WIRE_PinMode(OnePinMode_Typedef mode)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -70,30 +65,28 @@ static void ONE_WIRE_PinMode(OnePinMode_Typedef mode)
 	
 	if(mode == ONE_OUTPUT)
 	{
-//		oneWire_PORT->MODER &= ~(3UL << 2*oneWirePin_Idx);  //Reset State
-//		oneWire_PORT->MODER |= (0x01 << 2*oneWirePin_Idx); //Output Mode
 		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	}
 	else if(mode == ONE_INPUT)
 	{
-//		oneWire_PORT->MODER &= ~(3UL << 2*oneWirePin_Idx);  //Input Mode
 		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	}
 	
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }	
-//One Wire pin HIGH/LOW Write
+
 static void ONE_WIRE_Pin_Write(bool state)
 {
 	if(state) HAL_GPIO_WritePin(oneWire_PORT, oneWire_PIN, GPIO_PIN_SET);
 	else HAL_GPIO_WritePin(oneWire_PORT, oneWire_PIN, GPIO_PIN_RESET);
 }
+
 static bool ONE_WIRE_Pin_Read(void)
 {
 	return (1&HAL_GPIO_ReadPin(oneWire_PORT, oneWire_PIN));
 }
 
-//Microsecond delay
+
 static void DelayMicroSeconds(uint32_t uSec)
 {
 	uint32_t uSecVar = uSec;
@@ -101,23 +94,17 @@ static void DelayMicroSeconds(uint32_t uSec)
 	while(uSecVar--);
 }
 
-//DHT Begin function
+
 static void DHT22_StartAcquisition(void)
 {
-	//Change data pin mode to OUTPUT
 	ONE_WIRE_PinMode(ONE_OUTPUT);
-	//Put pin LOW
 	ONE_WIRE_Pin_Write(0);
-	//500uSec delay
 	DelayMicroSeconds(500);
-	//Bring pin HIGH
 	ONE_WIRE_Pin_Write(1);
-	//30 uSec delay
 	DelayMicroSeconds(30);
-	//Set pin as input
 	ONE_WIRE_PinMode(ONE_INPUT);
 }
-//Read 5 bytes
+
 static void DHT22_ReadRaw(uint8_t *data)
 {
 	uint32_t rawBits = 0UL;
@@ -149,7 +136,7 @@ static void DHT22_ReadRaw(uint8_t *data)
 	}
 	
 	
-	//Copy raw data to array of bytes
+	//On recupère les données en raw dans un tableau
 	data[0] = (rawBits>>24)&0xFF;
 	data[1] = (rawBits>>16)&0xFF;
 	data[2] = (rawBits>>8)&0xFF;
@@ -157,16 +144,16 @@ static void DHT22_ReadRaw(uint8_t *data)
 	data[4] = (checksumBits)&0xFF;
 }
 
-//Get Temperature and Humidity data
+
 bool DHT22_GetTemp_Humidity(float *Temp, float *Humidity)
 {
 	uint8_t dataArray[6], myChecksum;
 	uint16_t Temp16, Humid16;
-	//Implement Start data Aqcuisition routine
+
 	DHT22_StartAcquisition();
-	//Aqcuire raw data
+
 	DHT22_ReadRaw(dataArray);
-	//calculate checksum
+
 	myChecksum = 0;
 	for(uint8_t k=0; k<4; k++) 
 	{
@@ -382,45 +369,5 @@ static void MX_GPIO_Init(void)
 
 }
 
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  None
-  * @retval None
-  */
-void _Error_Handler(char * file, int line)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  while(1) 
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */ 
-}
-
-#ifdef USE_FULL_ASSERT
-
-/**
-   * @brief Reports the name of the source file and the source line number
-   * where the assert_param error has occurred.
-   * @param file: pointer to the source file name
-   * @param line: assert_param error line source number
-   * @retval None
-   */
-void assert_failed(uint8_t* file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-    ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-
-}
-
 #endif
 
-
-
-help : https://github.com/MYaqoobEmbedded/STM32-Tutorials/tree/master/Tutorial%2025%20-%20DHT22%20Temperature%20Sensor
